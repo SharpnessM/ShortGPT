@@ -67,53 +67,66 @@ def load_local_yaml_prompt(file_path):
 def open_file(filepath):
     with open(filepath, 'r', encoding='utf-8') as infile:
         return infile.read()
-from openai import OpenAI
+import google.generativeai as genai
+from shortGPT.config.api_db import ApiKeyManager
 
-def llm_completion(chat_prompt="", system="", temp=0.7, max_tokens=2000, remove_nl=True, conversation=None):
-    openai_key= ApiKeyManager.get_api_key("OPENAI_API_KEY")
+def llm_completion(chat_prompt="", system="", temp=0.7, max_tokens=2000, remove_nl=True, conversation=None): 
+    openai_key = ApiKeyManager.get_api_key("OPENAI_API_KEY")
     gemini_key = ApiKeyManager.get_api_key("GEMINI_API_KEY")
+    
+    model = "gemini-2.0-flash-001"
+
     if gemini_key:
-        client = OpenAI( 
-            api_key=gemini_key,
-            base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-        )
-        model="gemini-2.0-flash-lite-preview-02-05"
+        genai.configure(api_key=gemini_key)
+        client = genai.GenerativeModel(model)
     elif openai_key:
-        client = OpenAI( api_key=openai_key)
-        model="gpt-4o-mini"
+        from openai import OpenAI
+        client = OpenAI(api_key=openai_key)
+        model = "gpt-4o-mini"
     else:
         raise Exception("No OpenAI or Gemini API Key found for LLM request")
+
     max_retry = 5
     retry = 0
     error = ""
+
     for i in range(max_retry):
         try:
             if conversation:
                 messages = conversation
             else:
-                messages = [
-                    {"role": "system", "content": system},
-                    {"role": "user", "content": chat_prompt}
-                ]
-            response = client.chat.completions.create(
-                model=model,
-                messages=messages,
-                max_tokens=max_tokens,
-                temperature=temp,
-                timeout=30
+                messages = f"{system}\nUser: {chat_prompt}"
+
+            if gemini_key:
+                response = client.generate_content(messages)
+                text = response.text.strip()
+            else:
+                response = client.chat.completions.create(
+                    model=model,
+                    messages=[
+                        {"role": "system", "content": system},
+                        {"role": "user", "content": chat_prompt}
+                    ],
+                    max_tokens=max_tokens,
+                    temperature=temp,
+                    timeout=30
                 )
-            text = response.choices[0].message.content.strip()
+                text = response.choices[0].message.content.strip()
+
             if remove_nl:
                 text = re.sub('\s+', ' ', text)
-            filename = '%s_llm_completion.txt' % time()
-            if not os.path.exists('.logs/gpt_logs'):
-                os.makedirs('.logs/gpt_logs')
-            with open('.logs/gpt_logs/%s' % filename, 'w', encoding='utf-8') as outfile:
-                outfile.write(f"System prompt: ===\n{system}\n===\n"+f"Chat prompt: ===\n{chat_prompt}\n===\n" + f'RESPONSE:\n====\n{text}\n===\n')
+
+            filename = f".logs/gpt_logs/{time()}_llm_completion.txt"
+            os.makedirs('.logs/gpt_logs', exist_ok=True)
+            with open(filename, 'w', encoding='utf-8') as outfile:
+                outfile.write(f"System prompt: ===\n{system}\n===\nChat prompt: ===\n{chat_prompt}\n===\nRESPONSE:\n====\n{text}\n===\n")
+
             return text
+
         except Exception as oops:
             retry += 1
-            print('Error communicating with OpenAI:', oops)
+            print("Error communicating with API:", oops)
             error = str(oops)
             sleep(1)
-    raise Exception(f"Error communicating with LLM Endpoint Completion errored more than error: {error}")
+
+    raise Exception(f"Error: API request failed after {max_retry} attempts. Last error: {error}")
