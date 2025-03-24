@@ -18,3 +18,8 @@ moviepy==2.1.2
 progress
 questionary
 edge-tts
+httpx>=0.28.1
+protobuf>=4.25.2
+ffmpeg
+opencv-python-headless
+
