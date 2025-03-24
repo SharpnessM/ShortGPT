@@ -76,25 +76,25 @@ class ContentShortEngine(AbstractContentEngine):
             whisper_analysis)
 
     def _generateImageSearchTerms(self):
-    self.verifyParameters(captionsTimed=self._db_timed_captions)
+        self.verifyParameters(captionsTimed=self._db_timed_captions)
 
     # Ensure _db_num_images is an integer and has a valid value
-    if self._db_num_images is None:
-        self._db_num_images = 0  # Default to 0 if not set
+        if self._db_num_images is None:
+            self._db_num_images = 0  # Default to 0 if not set
 
-    try:
-        self._db_num_images = int(self._db_num_images)  # Convert if needed
-    except ValueError:
-        raise ValueError(f"Invalid _db_num_images value: {self._db_num_images}. Must be an integer.")
+        try:
+            self._db_num_images = int(self._db_num_images)  # Convert if needed
+        except ValueError:
+            raise ValueError(f"Invalid _db_num_images value: {self._db_num_images}. Must be an integer.")
 
-    print(f"Generating {self._db_num_images} image search terms...")  # Debugging output
+        print(f"Generating {self._db_num_images} image search terms...")  # Debugging output
 
-    if self._db_num_images > 0:
-        self._db_timed_image_searches = gpt_editing.getImageQueryPairs(
-            self._db_timed_captions, n=self._db_num_images
-        )
-    else:
-        self._db_timed_image_searches = []
+        if self._db_num_images > 0:
+            self._db_timed_image_searches = gpt_editing.getImageQueryPairs(
+                self._db_timed_captions, n=self._db_num_images
+           )
+        else:
+             self._db_timed_image_searches = []
 
 
     def _generateImageUrls(self):
