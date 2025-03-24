@@ -102,17 +102,18 @@ class RedditShortEngine(ContentShortEngine):
                     else:
                         self.logger(f"WARNING: Skipping invalid caption format -> {item}")
 
-            if self._db_num_images:
-                for item in self._db_timed_image_urls:
-                    if isinstance(item, tuple) and len(item) == 2:
-                        timing, image_url = item
-                        videoEditor.addEditingStep(EditingStep.SHOW_IMAGE, {
-                            'url': image_url,
-                            'set_time_start': timing[0],
-                            'set_time_end': timing[1]
-                        })
-                    else:
-                        self.logger(f"WARNING: Skipping invalid image format -> {item}")
+            if self._db_num_images and self._db_timed_image_urls:
+    for item in self._db_timed_image_urls:
+        if isinstance(item, tuple) and len(item) == 2:
+            timing, image_url = item
+            videoEditor.addEditingStep(EditingStep.SHOW_IMAGE, {
+                'url': image_url,
+                'set_time_start': timing[0],
+                'set_time_end': timing[1]
+            })
+        else:
+            self.logger(f"WARNING: Skipping invalid image format -> {item}")
+
 
             videoEditor.renderVideo(outputPath, logger=self.logger if self.logger is not self.default_logger else None)
         
