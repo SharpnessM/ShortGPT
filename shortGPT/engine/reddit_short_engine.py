@@ -120,10 +120,3 @@ class RedditShortEngine(ContentShortEngine):
             videoEditor.renderVideo(outputPath, logger=self.logger if self.logger is not self.default_logger else None)
         
         self._db_video_path = outputPath
-
-
-
-
-            videoEditor.renderVideo(outputPath, logger=self.logger if self.logger is not self.default_logger else None)
-        
-        self._db_video_path = outputPath
