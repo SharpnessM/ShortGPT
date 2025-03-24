@@ -38,6 +38,17 @@ def getCaptionsWithTime(video_path):
         (2, 5, "This is an example caption."),
         (5, 7, "Hope you enjoy the content.")
     ]
+def getSpeechBlocks(video_path):
+    """
+    Mock function to get speech blocks with timestamps.
+    Returns a list of tuples: [(start_time, end_time, speech_text)]
+    """
+    return [
+        (0, 2, "Hello, this is a test speech."),
+        (2, 5, "This is an example of a speech block."),
+        (5, 7, "Hope you find this helpful.")
+    ]
+
 
 
 def generate_video_with_captions(video_path, captions, output_path=None):
