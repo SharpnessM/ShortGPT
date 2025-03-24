@@ -106,7 +106,10 @@ class RedditShortEngine(ContentShortEngine):
                     else:
                         self.logger(f"WARNING: Skipping invalid caption format -> {item}")
 
-            if self._db_num_images:
+            if self._db_timed_image_urls is None:
+                self._db_timed_image_urls = [] 
+                print("DEBUG: _db_timed_image_urls =", self._db_timed_image_urls)
+
                 for item in self._db_timed_image_urls:
                     if isinstance(item, tuple) and len(item) == 2:
                         timing, image_url = item
