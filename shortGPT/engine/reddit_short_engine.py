@@ -60,7 +60,7 @@ class RedditShortEngine(ContentShortEngine):
             self.dynamicAssetDir+"redditThreadImage.png")
         self._db_reddit_thread_image = self.dynamicAssetDir+"redditThreadImage.png"
     
-    def _editAndRenderShort(self):
+        def _editAndRenderShort(self):
         """
         Override parent method to customize video rendering sequence by adding a Reddit image
         """
@@ -90,7 +90,8 @@ class RedditShortEngine(ContentShortEngine):
             
             caption_type = EditingStep.ADD_CAPTION_SHORT_ARABIC if self._db_language == Language.ARABIC.value else EditingStep.ADD_CAPTION_SHORT
             
-            if isinstance(self._db_timed_captions, list):
+            if self._db_timed_captions:
+                self.logger(f"Captions received: {self._db_timed_captions}")
                 for item in self._db_timed_captions:
                     if isinstance(item, tuple) and len(item) == 2 and isinstance(item[0], tuple) and len(item[0]) == 2:
                         timing, text = item
@@ -101,6 +102,8 @@ class RedditShortEngine(ContentShortEngine):
                         })
                     else:
                         self.logger(f"WARNING: Skipping invalid caption format -> {item}")
+            else:
+                self.logger("WARNING: No captions found!")
 
             if self._db_num_images and self._db_timed_image_urls:
                 for item in self._db_timed_image_urls:
@@ -113,6 +116,11 @@ class RedditShortEngine(ContentShortEngine):
                         })
                     else:
                         self.logger(f"WARNING: Skipping invalid image format -> {item}")
+
+            videoEditor.renderVideo(outputPath, logger=self.logger if self.logger is not self.default_logger else None)
+        
+        self._db_video_path = outputPath
+
 
 
 
