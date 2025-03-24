@@ -3,11 +3,11 @@ import numpy as np
 import os
 from typing import List, Tuple
 
-
-def draw_caption(frame, text, highlight_word, position=(50, 400), font=cv2.FONT_HERSHEY_SIMPLEX, font_scale=1,
-                 font_thickness=2, text_color=(255, 255, 255), highlight_color=(0, 255, 0)):
+def draw_caption(frame, text, highlight_word, position=(50, 400), font=cv2.FONT_HERSHEY_SIMPLEX, 
+                 font_scale=2.5, font_thickness=5, text_color=(255, 255, 255), 
+                 highlight_color=(0, 255, 0), outline_color=(0, 0, 0)):
     """
-    Draws caption text on the video frame, highlighting the current spoken word.
+    Draws CapCut-style captions with a highlight effect for the current word.
     """
     words = text.split()
     text_x, text_y = position
@@ -17,17 +17,21 @@ def draw_caption(frame, text, highlight_word, position=(50, 400), font=cv2.FONT_
         word_size = cv2.getTextSize(word, font, font_scale, font_thickness)[0]
         word_x = x_offset
 
-        # Highlight the word if it matches
+        # Black outline effect for better readability
+        cv2.putText(frame, word, (word_x + 2, text_y + 2), font, font_scale, outline_color, font_thickness + 3)
+        cv2.putText(frame, word, (word_x - 2, text_y - 2), font, font_scale, outline_color, font_thickness + 3)
+
+        # Highlight the current spoken word
         if word == highlight_word:
             cv2.rectangle(frame, (word_x - 5, text_y - 30), (word_x + word_size[0] + 5, text_y + 5), highlight_color, -1)
             cv2.putText(frame, word, (word_x, text_y), font, font_scale, (0, 0, 0), font_thickness)
         else:
             cv2.putText(frame, word, (word_x, text_y), font, font_scale, text_color, font_thickness)
 
-        x_offset += word_size[0] + 15  # Adjust spacing dynamically
+        x_offset += word_size[0] + 25  # Adjust spacing dynamically
 
     return frame
-                   
+
 def getCaptionsWithTime(video_path):
     """
     Mock function to get captions with timestamps.
@@ -38,22 +42,10 @@ def getCaptionsWithTime(video_path):
         (2, 5, "This is an example caption."),
         (5, 7, "Hope you enjoy the content.")
     ]
-def getSpeechBlocks(video_path):
-    """
-    Mock function to get speech blocks with timestamps.
-    Returns a list of tuples: [(start_time, end_time, speech_text)]
-    """
-    return [
-        (0, 2, "Hello, this is a test speech."),
-        (2, 5, "This is an example of a speech block."),
-        (5, 7, "Hope you find this helpful.")
-    ]
-
-
 
 def generate_video_with_captions(video_path, captions, output_path=None):
     """
-    Adds captions with dynamic word highlighting to the video.
+    Adds CapCut-style captions with pop-in animation to the video.
     """
     if output_path is None:
         output_path = os.path.join(os.path.dirname(video_path), "output.mp4")
