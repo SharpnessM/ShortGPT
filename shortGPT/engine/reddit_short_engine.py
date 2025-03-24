@@ -88,24 +88,25 @@ class RedditShortEngine(ContentShortEngine):
             
             videoEditor.addEditingStep(EditingStep.ADD_REDDIT_IMAGE, {'url': self._db_reddit_thread_image})
             
-            caption_type = EditingStep.ADD_CAPTION_SHORT_ARABIC if self._db_language == Language.ARABIC.value else EditingStep.ADD_CAPTION_SHORT
-            
-            if self._db_timed_captions:
-                self.logger(f"Captions received: {self._db_timed_captions}")
+            # CapCut-style captions: Large, animated, and bold
+            if isinstance(self._db_timed_captions, list):
                 for item in self._db_timed_captions:
                     if isinstance(item, tuple) and len(item) == 2 and isinstance(item[0], tuple) and len(item[0]) == 2:
                         timing, text = item
-                        videoEditor.addEditingStep(caption_type, {
+                        videoEditor.addEditingStep(EditingStep.ADD_CAPTION_CAPCUT_STYLE, {
                             'text': text.upper(),
                             'set_time_start': timing[0],
-                            'set_time_end': timing[1]
+                            'set_time_end': timing[1],
+                            'font_size': 60,
+                            'font_weight': 'bold',
+                            'animation': 'pop-in',
+                            'color': 'white',
+                            'outline': 'black'
                         })
                     else:
                         self.logger(f"WARNING: Skipping invalid caption format -> {item}")
-            else:
-                self.logger("WARNING: No captions found!")
 
-            if self._db_num_images and self._db_timed_image_urls:
+            if self._db_num_images:
                 for item in self._db_timed_image_urls:
                     if isinstance(item, tuple) and len(item) == 2:
                         timing, image_url = item
