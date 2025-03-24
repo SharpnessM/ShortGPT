@@ -60,7 +60,7 @@ class RedditShortEngine(ContentShortEngine):
             self.dynamicAssetDir+"redditThreadImage.png")
         self._db_reddit_thread_image = self.dynamicAssetDir+"redditThreadImage.png"
     
-        def _editAndRenderShort(self):
+    def _editAndRenderShort(self):
         """
         Override parent method to customize video rendering sequence by adding a Reddit image
         """
