@@ -1,6 +1,8 @@
 import cv2
 import numpy as np
 import os
+from typing import List, Tuple
+
 
 def draw_caption(frame, text, highlight_word, position=(50, 400), font=cv2.FONT_HERSHEY_SIMPLEX, font_scale=1,
                  font_thickness=2, text_color=(255, 255, 255), highlight_color=(0, 255, 0)):
@@ -25,6 +27,18 @@ def draw_caption(frame, text, highlight_word, position=(50, 400), font=cv2.FONT_
         x_offset += word_size[0] + 15  # Adjust spacing dynamically
 
     return frame
+                   
+def getCaptionsWithTime(video_path):
+    """
+    Mock function to get captions with timestamps.
+    Returns a list of tuples: [(start_time, end_time, caption_text)]
+    """
+    return [
+        (0, 2, "Hello, welcome to this video."),
+        (2, 5, "This is an example caption."),
+        (5, 7, "Hope you enjoy the content.")
+    ]
+
 
 def generate_video_with_captions(video_path, captions, output_path=None):
     """
